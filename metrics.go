@@ -16,6 +16,12 @@ const (
 	metricsAlphaFactor   = 0.015
 )
 
+func init() {
+	// Disable go-metrics, can lead to memory leaks in Sarama
+	// https://github.com/Shopify/sarama/issues/1321#issuecomment-547530477
+	metrics.UseNilMetrics = true
+}
+
 func getOrRegisterHistogram(name string, r metrics.Registry) metrics.Histogram {
 	return r.GetOrRegister(name, func() metrics.Histogram {
 		return metrics.NewHistogram(metrics.NewExpDecaySample(metricsReservoirSize, metricsAlphaFactor))
